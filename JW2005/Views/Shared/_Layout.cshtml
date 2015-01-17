@@ -1,0 +1,35 @@
+﻿<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@ViewBag.Title</title>
+    @Styles.Render("~/Content/bootstrap")
+    @if (Request.UserAgent == null)
+    {
+        @Styles.Render("~/Content/site-windows")
+    }
+    else
+    {
+        var ua = Request.UserAgent.ToLower();
+        if (ua.Contains("linux") || ua.Contains("android"))
+        {
+            @Styles.Render("~/Content/site-linux")
+        }
+        else if (ua.Contains("mac os x"))
+        {
+            @Styles.Render("~/Content/site-osx")
+        }
+        else
+        {
+            @Styles.Render("~/Content/site-windows")
+        }
+    }
+    @Scripts.Render("~/Bundles/modernizr")
+</head>
+<body>
+    @RenderBody()
+    @Scripts.Render("~/Bundles/jquery")
+    @Scripts.Render("~/Bundles/bootstrap")
+</body>
+</html>

@@ -1,0 +1,27 @@
+﻿@using JW2005.Models
+@model IEnumerable<Server>
+@{
+    ViewBag.Title = "绝望2005 - 实时状态播报";
+}
+<div class="container">
+    <div class="hidden-xs title-header">
+        <h1 class="title">@ViewBag.Title</h1>
+    </div>
+    <div class="visible-xs-block title-header">
+        <h1 class="text-center title">绝望2005</h1>
+        <h1 class="text-center title">实时状态播报</h1>
+    </div>
+    <div class="list-group">
+        @foreach (var server in Model)
+        {
+            if (server.Status == ServerStatus.Down)
+            {
+                <a class="list-group-item list-group-item-danger server-list-item" href="http://@server.Hostname/" target="_blank"><i class="fa fa-heart-o fa-fw"></i>&nbsp;&nbsp;Server #@server.Id - Down</a>
+            }
+            else
+            {
+                <a class="list-group-item list-group-item-success server-list-item" href="http://@server.Hostname/" target="_blank"><i class="fa fa-heart fa-fw"></i>&nbsp;&nbsp;Server #@server.Id - Online</a>
+            }
+        }
+    </div>
+</div>
