@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -14,6 +15,7 @@ namespace JW2005.Controllers.API
     {
         private static bool _isPinging;
         private readonly Jw2005Context _db = new Jw2005Context();
+        private bool _disposeDb = true;
 
         public IEnumerable<Server> Get()
         {
@@ -34,28 +36,45 @@ namespace JW2005.Controllers.API
                 return StatusCode(HttpStatusCode.NotModified);
 
             _isPinging = true;
+            _disposeDb = false;
             Task.Run(() =>
             {
-                foreach (var server in _db.Servers.ToList())
+                try
                 {
-                    var request = WebRequest.Create(string.Format("http://{0}/", server.Hostname));
-                    request.Method = WebRequestMethods.Http.Head;
-                    using (var response = (HttpWebResponse) request.GetResponse())
+                    foreach (var server in _db.Servers.ToList())
                     {
-                        server.Status = response.StatusCode == HttpStatusCode.OK
-                            ? ServerStatus.Online
-                            : ServerStatus.Down;
+                        try
+                        {
+                            var request = WebRequest.Create(string.Format("http://{0}/", server.Hostname));
+                            request.Timeout = 5000;
+                            request.Method = WebRequestMethods.Http.Head;
+                            using (var response = (HttpWebResponse) request.GetResponse())
+                            {
+                                server.Status = response.StatusCode == HttpStatusCode.OK
+                                    ? ServerStatus.Online
+                                    : ServerStatus.Down;
+                            }
+                        }
+                        catch (WebException)
+                        {
+                            server.Status = ServerStatus.Down;
+                        }
                         _db.SaveChanges();
                     }
                 }
+                catch (Exception)
+                {
+                    // ignored
+                }
                 _isPinging = false;
+                _db.Dispose();
             });
             return StatusCode(HttpStatusCode.Accepted);
         }
 
         protected override void Dispose(bool disposing)
         {
-            if (disposing)
+            if (disposing && _disposeDb)
                 _db.Dispose();
             base.Dispose(disposing);
         }
