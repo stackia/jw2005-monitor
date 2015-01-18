@@ -11,5 +11,12 @@ namespace JW2005.Controllers
         {
             return View(_db.Servers);
         }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+                _db.Dispose();
+            base.Dispose(disposing);
+        }
     }
 }

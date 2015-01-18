@@ -52,5 +52,12 @@ namespace JW2005.Controllers.API
             });
             return StatusCode(HttpStatusCode.Accepted);
         }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+                _db.Dispose();
+            base.Dispose(disposing);
+        }
     }
 }
