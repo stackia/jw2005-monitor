@@ -47,7 +47,6 @@ namespace JW2005.Controllers.API
                         {
                             var request = WebRequest.Create(string.Format("http://{0}/", server.Hostname));
                             request.Timeout = 5000;
-                            request.Method = WebRequestMethods.Http.Head;
                             using (var response = (HttpWebResponse) request.GetResponse())
                             {
                                 server.Status = response.StatusCode == HttpStatusCode.OK
